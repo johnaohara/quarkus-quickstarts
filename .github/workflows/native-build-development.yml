@@ -29,15 +29,29 @@ jobs:
 
       - name: Build Quarkus master
         run: |
-          git clone https://github.com/quarkusio/quarkus.git \
-          && cd quarkus \
-          && mvn -B clean install -DskipTests -DskipITs
+          git clone https://github.com/quarkusio/quarkus.git
+          cd quarkus
+          mvn -B clean install -DskipTests -DskipITs
 
       - name: Build Quickstart with native
         run: |
           mvn -B clean install -Pnative \
             -Dquarkus.native.container-build=true \
             -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:19.3.1-java8
+
+      - name: Check RSS
+        env:
+          QUICKSTART_VERSION: "1.0-SNAPSHOT"
+          RSS_THRESHOLD: "25000"
+        run: |
+          getting-started/target/getting-started-${QUICKSTART_VERSION}-runner -Xmx2m > server.log &
+          sleep 2
+          ps --no-headers  -C getting-started-${QUICKSTART_VERSION}-runner -o rss > rss.out
+          rss=$(< rss.out)
+          echo "Threshold: ${RSS_THRESHOLD}"
+          echo "RSS: $rss"
+          [ "$rss" -gt "${RSS_THRESHOLD}" ] && exit 1 || exit 0
+
       - name: Report
         if: always()
         env:
