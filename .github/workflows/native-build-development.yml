@@ -60,8 +60,7 @@ jobs:
           echo "Start time (ms): $startTimeMs"
           [ "$rss" -lt "${RSS_THRESHOLD}" ] && [ "$startTimeMs" -lt "${START_TIME_THRESHOLD}" ] && exit 0 || exit 1
 
-      - name: Upload RSS stats
-        uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v1
           with:
             name: pmap
             path: pmap.out
