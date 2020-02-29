@@ -35,6 +35,7 @@ jobs:
 
       - name: Build Quickstart with native
         run: |
+          cd getting-started
           mvn -B clean install --fail-at-end -Pnative \
             -Dquarkus.native.container-build=true \
             -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:19.3.1-java8 \
