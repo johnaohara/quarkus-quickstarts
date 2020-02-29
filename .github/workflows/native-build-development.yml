@@ -46,8 +46,10 @@ jobs:
           RSS_THRESHOLD: "25000"
           START_TIME_THRESHOLD: "1000"
         run: |
-          getting-started/target/getting-started-${QUICKSTART_VERSION}-runner -Xmx2m > server.log &
+          getting-started/target/getting-started-${QUICKSTART_VERSION}-runner -Xmx2m -Dquarkus.http.io-threads=1 -Dquarkus.vertx.worker-pool-size=1 > server.log &
           sleep 2
+          appPid=!$
+          pmap -x 1$ > pmap.out
           ps --no-headers  -C getting-started-${QUICKSTART_VERSION}-runner -o rss > rss.out
           rss=$(< rss.out)
           echo "Threshold (kB): ${RSS_THRESHOLD}"
@@ -57,6 +59,12 @@ jobs:
           echo "Start time Threshold (ms): ${START_TIME_THRESHOLD}"
           echo "Start time (ms): $startTimeMs"
           [ "$rss" -lt "${RSS_THRESHOLD}" ] && [ "$startTimeMs" -lt "${START_TIME_THRESHOLD}" ] && exit 0 || exit 1
+
+      - name: Upload RSS stats
+        uses: actions/upload-artifact@v1
+          with:
+            name: pmap
+            path: pmap.out
 
       - name: Report
         if: always()
