@@ -62,9 +62,9 @@ jobs:
           [ "$rss" -lt "${RSS_THRESHOLD}" ] && [ "$startTimeMs" -lt "${START_TIME_THRESHOLD}" ] && exit 0 || exit 1
 
       - uses: actions/upload-artifact@v1
-          with:
-            name: pmap
-            path: pmap.out
+        with:
+          name: pmap
+          path: pmap.out
 
       - name: Report
         if: always()
